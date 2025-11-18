@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_15ebaeb266aaead6f1ff18dbd9cd79b0 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+</head>
+<body>
+    
+    
+    <style>
+        /* Dark Popup Styles */
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+            background-color: #1e1e1e !important;
+            color: #ffffff !important;
+            border: 1px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .leaflet-popup-content {
+            margin: 15px;
+            line-height: 1.5;
+        }
+        /* Glassmorphism for Controls */
+        .glass-panel {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+    </style>
+    
+    
+         <div class="glass-panel" style="position: fixed; 
+         top: 20px; left: 60px; width: auto; max-width: 350px; z-index:1000;">
+             <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 4px;">
+                 Waymo Service Locations
+             </div>
+             <div style="font-size: 13px; color: #ddd; font-weight: 400;">
+                 Global Deployment Status & Coverage
+             </div>
+         </div>
+    
+    
+    <div class="glass-panel" style="position: fixed; 
+                bottom: 30px; right: 30px; width: 200px; z-index:1000;">
+      <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">
+          Status Legend
+      </div>
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+          <span style="background:#00e676; width:10px; height:10px; border-radius:50%; margin-right:10px; box-shadow: 0 0 5px #00e676;"></span> 
+          <span style="font-size: 12px;">Fully Autonomous</span>
+      </div>
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+          <span style="background:#2979ff; width:10px; height:10px; border-radius:50%; margin-right:10px;"></span> 
+          <span style="font-size: 12px;">Employee Testing</span>
+      </div>
+      <div style="display: flex; align-items: center; margin-bottom: 6px;">
+          <span style="background:#ffea00; width:10px; height:10px; border-radius:50%; margin-right:10px;"></span> 
+          <span style="font-size: 12px;">Safety Drivers</span>
+      </div>
+      <div style="display: flex; align-items: center;">
+          <span style="background:#ff9100; width:10px; height:10px; border-radius:50%; margin-right:10px;"></span> 
+          <span style="font-size: 12px;">Planned (2026)</span>
+      </div>
+    </div>
+    
+    
+            <div class="folium-map" id="map_15ebaeb266aaead6f1ff18dbd9cd79b0" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_15ebaeb266aaead6f1ff18dbd9cd79b0 = L.map(
+                "map_15ebaeb266aaead6f1ff18dbd9cd79b0",
+                {
+                    center: [39.8283, -98.5795],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 4,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_fc5badb7ab5a65bec18243afc5b96be8 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_fc5badb7ab5a65bec18243afc5b96be8.addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topright",
+  "title": "Expand me",
+  "titleCancel": "Exit me",
+  "forceSeparateButton": true,
+}
+            ).addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+        
+    
+            var feature_group_155df69e7b5cd8670ca9198b3c2e4422 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_fa423bb769a8a62709d3ff4845e496b4 = L.circleMarker(
+                [33.4482948, -112.0725488],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#00e676", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.4, "radius": 16, "stroke": true, "weight": 1}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+            circle_marker_fa423bb769a8a62709d3ff4845e496b4.bindTooltip(
+                `<div>
+                     Phoenix (Region)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_04da57ae2b2f41e1f3145b81026d1703 = L.circleMarker(
+                [33.4482948, -112.0725488],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00e676", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+        var popup_7288bde7cc590aaaa96542fe4236bd48 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9d651969864a2bae92b2a1fb6f372a26 = $(`<div id="html_9d651969864a2bae92b2a1fb6f372a26" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Phoenix                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #00e676;                          border: 1px solid #00e676;                         background-color: rgba(0, 230, 118, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Fully Autonomous                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     315 sq mi, includes airport                 </div>             </div>         </div>`)[0];
+                popup_7288bde7cc590aaaa96542fe4236bd48.setContent(html_9d651969864a2bae92b2a1fb6f372a26);
+            
+        
+
+        circle_marker_04da57ae2b2f41e1f3145b81026d1703.bindPopup(popup_7288bde7cc590aaaa96542fe4236bd48)
+        ;
+
+        
+    
+    
+            circle_marker_04da57ae2b2f41e1f3145b81026d1703.bindTooltip(
+                `<div>
+                     Phoenix (Fully Autonomous)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9441b8893e41fa1653f95a9203ccf83e = L.circleMarker(
+                [37.7749295, -122.4194155],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#00e676", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.4, "radius": 16, "stroke": true, "weight": 1}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+            circle_marker_9441b8893e41fa1653f95a9203ccf83e.bindTooltip(
+                `<div>
+                     San Francisco (Region)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4345a907a3121ac9f5f6eb6b521f502b = L.circleMarker(
+                [37.7749295, -122.4194155],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00e676", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+        var popup_02d6f645e48e7ee039a25d6fe6e7ad49 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2c7f4eb30d2390aae82df232f9708c2e = $(`<div id="html_2c7f4eb30d2390aae82df232f9708c2e" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     San Francisco                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #00e676;                          border: 1px solid #00e676;                         background-color: rgba(0, 230, 118, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Fully Autonomous                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     55+ sq mi, Bay Area                 </div>             </div>         </div>`)[0];
+                popup_02d6f645e48e7ee039a25d6fe6e7ad49.setContent(html_2c7f4eb30d2390aae82df232f9708c2e);
+            
+        
+
+        circle_marker_4345a907a3121ac9f5f6eb6b521f502b.bindPopup(popup_02d6f645e48e7ee039a25d6fe6e7ad49)
+        ;
+
+        
+    
+    
+            circle_marker_4345a907a3121ac9f5f6eb6b521f502b.bindTooltip(
+                `<div>
+                     San Francisco (Fully Autonomous)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6a1f721659f27605d4b1c8af90f5896a = L.circleMarker(
+                [37.33874, -121.8852525],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#00e676", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.4, "radius": 16, "stroke": true, "weight": 1}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+            circle_marker_6a1f721659f27605d4b1c8af90f5896a.bindTooltip(
+                `<div>
+                     San Jose (Region)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ae647c5ab70a84c2c1134a9f0d4ede13 = L.circleMarker(
+                [37.33874, -121.8852525],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00e676", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+        var popup_ab77da588551eadd029d6f6b72da1ffb = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_0799480fda1cfd4843ad2c19505a69c5 = $(`<div id="html_0799480fda1cfd4843ad2c19505a69c5" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     San Jose                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #00e676;                          border: 1px solid #00e676;                         background-color: rgba(0, 230, 118, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Fully Autonomous                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Part of Bay Area expansion, includes airport                 </div>             </div>         </div>`)[0];
+                popup_ab77da588551eadd029d6f6b72da1ffb.setContent(html_0799480fda1cfd4843ad2c19505a69c5);
+            
+        
+
+        circle_marker_ae647c5ab70a84c2c1134a9f0d4ede13.bindPopup(popup_ab77da588551eadd029d6f6b72da1ffb)
+        ;
+
+        
+    
+    
+            circle_marker_ae647c5ab70a84c2c1134a9f0d4ede13.bindTooltip(
+                `<div>
+                     San Jose (Fully Autonomous)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ae0f4817f8735e79c2d5f163fa9a2275 = L.circleMarker(
+                [34.0549076, -118.242643],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#00e676", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.4, "radius": 16, "stroke": true, "weight": 1}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+            circle_marker_ae0f4817f8735e79c2d5f163fa9a2275.bindTooltip(
+                `<div>
+                     Los Angeles (Region)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c38ad6a3098cedb1ada58fd193fd8153 = L.circleMarker(
+                [34.0549076, -118.242643],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00e676", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+        var popup_5c2062a2791199ce2807c22b8641d4ce = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_210baf34d276bcf0892feadee6c8d5e1 = $(`<div id="html_210baf34d276bcf0892feadee6c8d5e1" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Los Angeles                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #00e676;                          border: 1px solid #00e676;                         background-color: rgba(0, 230, 118, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Fully Autonomous                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     120+ sq mi                 </div>             </div>         </div>`)[0];
+                popup_5c2062a2791199ce2807c22b8641d4ce.setContent(html_210baf34d276bcf0892feadee6c8d5e1);
+            
+        
+
+        circle_marker_c38ad6a3098cedb1ada58fd193fd8153.bindPopup(popup_5c2062a2791199ce2807c22b8641d4ce)
+        ;
+
+        
+    
+    
+            circle_marker_c38ad6a3098cedb1ada58fd193fd8153.bindTooltip(
+                `<div>
+                     Los Angeles (Fully Autonomous)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f405c3da1da472176aa1cffb2f864af7 = L.circleMarker(
+                [30.267153, -97.7430608],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#00e676", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.4, "radius": 16, "stroke": true, "weight": 1}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+            circle_marker_f405c3da1da472176aa1cffb2f864af7.bindTooltip(
+                `<div>
+                     Austin (Region)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5560dbf4d3cc53266c7b68bb1add7a95 = L.circleMarker(
+                [30.267153, -97.7430608],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00e676", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+        var popup_38b7b8d09fbe9cee62d865517cb82797 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c3ab9ab78dc4680db0a5fdaed7d7f936 = $(`<div id="html_c3ab9ab78dc4680db0a5fdaed7d7f936" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Austin                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #00e676;                          border: 1px solid #00e676;                         background-color: rgba(0, 230, 118, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Fully Autonomous                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Via Uber partnership                 </div>             </div>         </div>`)[0];
+                popup_38b7b8d09fbe9cee62d865517cb82797.setContent(html_c3ab9ab78dc4680db0a5fdaed7d7f936);
+            
+        
+
+        circle_marker_5560dbf4d3cc53266c7b68bb1add7a95.bindPopup(popup_38b7b8d09fbe9cee62d865517cb82797)
+        ;
+
+        
+    
+    
+            circle_marker_5560dbf4d3cc53266c7b68bb1add7a95.bindTooltip(
+                `<div>
+                     Austin (Fully Autonomous)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1e705b476e84eb7bcf3478f241aa7fa6 = L.circleMarker(
+                [33.7501275, -84.3885209],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#00e676", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 0.4, "radius": 16, "stroke": true, "weight": 1}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+            circle_marker_1e705b476e84eb7bcf3478f241aa7fa6.bindTooltip(
+                `<div>
+                     Atlanta (Region)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bd00dd3465b122a2f55048bfa8b2a13c = L.circleMarker(
+                [33.7501275, -84.3885209],
+                {"bubblingMouseEvents": true, "color": "#00e676", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#00e676", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
+            ).addTo(feature_group_155df69e7b5cd8670ca9198b3c2e4422);
+        
+    
+        var popup_10aa78b3b50ba6cb77e6149591e207b5 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_084fea39fd1a5a11665074666642c97f = $(`<div id="html_084fea39fd1a5a11665074666642c97f" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Atlanta                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #00e676;                          border: 1px solid #00e676;                         background-color: rgba(0, 230, 118, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Fully Autonomous                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Via Uber partnership                 </div>             </div>         </div>`)[0];
+                popup_10aa78b3b50ba6cb77e6149591e207b5.setContent(html_084fea39fd1a5a11665074666642c97f);
+            
+        
+
+        circle_marker_bd00dd3465b122a2f55048bfa8b2a13c.bindPopup(popup_10aa78b3b50ba6cb77e6149591e207b5)
+        ;
+
+        
+    
+    
+            circle_marker_bd00dd3465b122a2f55048bfa8b2a13c.bindTooltip(
+                `<div>
+                     Atlanta (Fully Autonomous)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_155df69e7b5cd8670ca9198b3c2e4422.addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+        
+    
+            var feature_group_bc51525a2365f6447e9f1e54427a394b = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_7a9fbea70857fc6626566b36794470eb = L.circleMarker(
+                [25.7616798, -80.1917902],
+                {"bubblingMouseEvents": true, "color": "#2979ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2979ff", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_bc51525a2365f6447e9f1e54427a394b);
+        
+    
+        var popup_dce44aea2267f8ecdfa2014c21b0408d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_316113f96347cf7b3f046b65c188972e = $(`<div id="html_316113f96347cf7b3f046b65c188972e" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Miami                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #2979ff;                          border: 1px solid #2979ff;                         background-color: rgba(41, 121, 255, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Employee Testing                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Started Nov 18, 2025                 </div>             </div>         </div>`)[0];
+                popup_dce44aea2267f8ecdfa2014c21b0408d.setContent(html_316113f96347cf7b3f046b65c188972e);
+            
+        
+
+        circle_marker_7a9fbea70857fc6626566b36794470eb.bindPopup(popup_dce44aea2267f8ecdfa2014c21b0408d)
+        ;
+
+        
+    
+    
+            circle_marker_7a9fbea70857fc6626566b36794470eb.bindTooltip(
+                `<div>
+                     Miami (Employee Testing)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a24d7ac7826dc12a67053c93bb2c7ddc = L.circleMarker(
+                [32.7766642, -96.7969879],
+                {"bubblingMouseEvents": true, "color": "#2979ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2979ff", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_bc51525a2365f6447e9f1e54427a394b);
+        
+    
+        var popup_5f481ef9945677d6c775666153147663 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_488a92f26d1ba4ad591010188cdb9ab1 = $(`<div id="html_488a92f26d1ba4ad591010188cdb9ab1" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Dallas                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #2979ff;                          border: 1px solid #2979ff;                         background-color: rgba(41, 121, 255, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Employee Testing                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Starting soon, public 2026                 </div>             </div>         </div>`)[0];
+                popup_5f481ef9945677d6c775666153147663.setContent(html_488a92f26d1ba4ad591010188cdb9ab1);
+            
+        
+
+        circle_marker_a24d7ac7826dc12a67053c93bb2c7ddc.bindPopup(popup_5f481ef9945677d6c775666153147663)
+        ;
+
+        
+    
+    
+            circle_marker_a24d7ac7826dc12a67053c93bb2c7ddc.bindTooltip(
+                `<div>
+                     Dallas (Employee Testing)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2b5497b1a31239a98149161fbe5fa7c2 = L.circleMarker(
+                [29.7600771, -95.3701108],
+                {"bubblingMouseEvents": true, "color": "#2979ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2979ff", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_bc51525a2365f6447e9f1e54427a394b);
+        
+    
+        var popup_17b326eb617de23fc31424f73156232d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a7323fd0e6fcf2a7af636ca394bb0b31 = $(`<div id="html_a7323fd0e6fcf2a7af636ca394bb0b31" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Houston                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #2979ff;                          border: 1px solid #2979ff;                         background-color: rgba(41, 121, 255, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Employee Testing                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Starting soon, public 2026                 </div>             </div>         </div>`)[0];
+                popup_17b326eb617de23fc31424f73156232d.setContent(html_a7323fd0e6fcf2a7af636ca394bb0b31);
+            
+        
+
+        circle_marker_2b5497b1a31239a98149161fbe5fa7c2.bindPopup(popup_17b326eb617de23fc31424f73156232d)
+        ;
+
+        
+    
+    
+            circle_marker_2b5497b1a31239a98149161fbe5fa7c2.bindTooltip(
+                `<div>
+                     Houston (Employee Testing)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8c73d141a55abefaea991edb89a71f43 = L.circleMarker(
+                [29.4251905, -98.4945922],
+                {"bubblingMouseEvents": true, "color": "#2979ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2979ff", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_bc51525a2365f6447e9f1e54427a394b);
+        
+    
+        var popup_27c8de5578b6b15300159e1ac9b3a250 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_280227705e48e585a7a1355a43f00b5f = $(`<div id="html_280227705e48e585a7a1355a43f00b5f" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     San Antonio                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #2979ff;                          border: 1px solid #2979ff;                         background-color: rgba(41, 121, 255, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Employee Testing                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Starting soon, public 2026                 </div>             </div>         </div>`)[0];
+                popup_27c8de5578b6b15300159e1ac9b3a250.setContent(html_280227705e48e585a7a1355a43f00b5f);
+            
+        
+
+        circle_marker_8c73d141a55abefaea991edb89a71f43.bindPopup(popup_27c8de5578b6b15300159e1ac9b3a250)
+        ;
+
+        
+    
+    
+            circle_marker_8c73d141a55abefaea991edb89a71f43.bindTooltip(
+                `<div>
+                     San Antonio (Employee Testing)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7e32707769959269e60953c1a8ff28cb = L.circleMarker(
+                [28.5383832, -81.3789269],
+                {"bubblingMouseEvents": true, "color": "#2979ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2979ff", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_bc51525a2365f6447e9f1e54427a394b);
+        
+    
+        var popup_7ef554ebf1fb14fbd269b6b91178d317 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_98e80b3e973a2ae9a2b51bf2b8ad8572 = $(`<div id="html_98e80b3e973a2ae9a2b51bf2b8ad8572" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Orlando                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #2979ff;                          border: 1px solid #2979ff;                         background-color: rgba(41, 121, 255, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Employee Testing                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Starting soon, public 2026                 </div>             </div>         </div>`)[0];
+                popup_7ef554ebf1fb14fbd269b6b91178d317.setContent(html_98e80b3e973a2ae9a2b51bf2b8ad8572);
+            
+        
+
+        circle_marker_7e32707769959269e60953c1a8ff28cb.bindPopup(popup_7ef554ebf1fb14fbd269b6b91178d317)
+        ;
+
+        
+    
+    
+            circle_marker_7e32707769959269e60953c1a8ff28cb.bindTooltip(
+                `<div>
+                     Orlando (Employee Testing)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_bc51525a2365f6447e9f1e54427a394b.addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+        
+    
+            var feature_group_5cc52c4ec40d99d676882269664db6c3 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_971b700341116a77adaba123dcbaba0d = L.circleMarker(
+                [40.7127753, -74.0059728],
+                {"bubblingMouseEvents": true, "color": "#ffea00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ffea00", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_5cc52c4ec40d99d676882269664db6c3);
+        
+    
+        var popup_c04b45a3b5def308d9ee8f54281a7187 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f8120020ab3bbeeec4044c4afc7d4db3 = $(`<div id="html_f8120020ab3bbeeec4044c4afc7d4db3" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     New York City                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ffea00;                          border: 1px solid #ffea00;                         background-color: rgba(255, 234, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Testing (Safety Drivers)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     8 vehicles, Manhattan/Brooklyn pilot                 </div>             </div>         </div>`)[0];
+                popup_c04b45a3b5def308d9ee8f54281a7187.setContent(html_f8120020ab3bbeeec4044c4afc7d4db3);
+            
+        
+
+        circle_marker_971b700341116a77adaba123dcbaba0d.bindPopup(popup_c04b45a3b5def308d9ee8f54281a7187)
+        ;
+
+        
+    
+    
+            circle_marker_971b700341116a77adaba123dcbaba0d.bindTooltip(
+                `<div>
+                     New York City (Testing (Safety Drivers))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5a532fe4c2c2d532fee5ed0f8da39267 = L.circleMarker(
+                [35.6764225, 139.650027],
+                {"bubblingMouseEvents": true, "color": "#ffea00", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ffea00", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_5cc52c4ec40d99d676882269664db6c3);
+        
+    
+        var popup_14713b208e94eaca1a287c25d728cc00 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_90e2d1398c4e6b00a6b05e2e59283852 = $(`<div id="html_90e2d1398c4e6b00a6b05e2e59283852" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Tokyo                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ffea00;                          border: 1px solid #ffea00;                         background-color: rgba(255, 234, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Testing (Safety Drivers)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Multiple wards                 </div>             </div>         </div>`)[0];
+                popup_14713b208e94eaca1a287c25d728cc00.setContent(html_90e2d1398c4e6b00a6b05e2e59283852);
+            
+        
+
+        circle_marker_5a532fe4c2c2d532fee5ed0f8da39267.bindPopup(popup_14713b208e94eaca1a287c25d728cc00)
+        ;
+
+        
+    
+    
+            circle_marker_5a532fe4c2c2d532fee5ed0f8da39267.bindTooltip(
+                `<div>
+                     Tokyo (Testing (Safety Drivers))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_5cc52c4ec40d99d676882269664db6c3.addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+        
+    
+            var feature_group_0cab5303d1f153a58c3ff547f85e9731 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_41c9bb85db9b4d205d9335660dd51279 = L.circleMarker(
+                [38.9071923, -77.0368707],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_f3db0092ec6a49fe332c5622d54fe356 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7a2e1311313b726e32a4a3ee2e886f80 = $(`<div id="html_7a2e1311313b726e32a4a3ee2e886f80" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Washington                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Announced March 2025                 </div>             </div>         </div>`)[0];
+                popup_f3db0092ec6a49fe332c5622d54fe356.setContent(html_7a2e1311313b726e32a4a3ee2e886f80);
+            
+        
+
+        circle_marker_41c9bb85db9b4d205d9335660dd51279.bindPopup(popup_f3db0092ec6a49fe332c5622d54fe356)
+        ;
+
+        
+    
+    
+            circle_marker_41c9bb85db9b4d205d9335660dd51279.bindTooltip(
+                `<div>
+                     Washington (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_dd878beab89bad68e171191e6ea2ec70 = L.circleMarker(
+                [42.32971819999999, -83.0424533],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_d8bc78472953bce0f06b976600fe2584 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_00ac7391ca27b9c9e2ac1a6565265535 = $(`<div id="html_00ac7391ca27b9c9e2ac1a6565265535" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Detroit                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Winter testing experience                 </div>             </div>         </div>`)[0];
+                popup_d8bc78472953bce0f06b976600fe2584.setContent(html_00ac7391ca27b9c9e2ac1a6565265535);
+            
+        
+
+        circle_marker_dd878beab89bad68e171191e6ea2ec70.bindPopup(popup_d8bc78472953bce0f06b976600fe2584)
+        ;
+
+        
+    
+    
+            circle_marker_dd878beab89bad68e171191e6ea2ec70.bindTooltip(
+                `<div>
+                     Detroit (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_19978c2597b18221a6df2c2ad92b1970 = L.circleMarker(
+                [36.171563, -115.1391009],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_850c982347fa0cd306c0b4f20322b0b0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9228d1eeacc14605576646a838064ae2 = $(`<div id="html_9228d1eeacc14605576646a838064ae2" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Las Vegas                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Summer 2026                 </div>             </div>         </div>`)[0];
+                popup_850c982347fa0cd306c0b4f20322b0b0.setContent(html_9228d1eeacc14605576646a838064ae2);
+            
+        
+
+        circle_marker_19978c2597b18221a6df2c2ad92b1970.bindPopup(popup_850c982347fa0cd306c0b4f20322b0b0)
+        ;
+
+        
+    
+    
+            circle_marker_19978c2597b18221a6df2c2ad92b1970.bindTooltip(
+                `<div>
+                     Las Vegas (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_de6301c94896a28f83e016f28bc691d6 = L.circleMarker(
+                [32.715738, -117.1610838],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_5b4bfaf16944634e933a48e0273e246a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_b3c1732f6b63525235d6187b3bbe5fd0 = $(`<div id="html_b3c1732f6b63525235d6187b3bbe5fd0" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     San Diego                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     Permits pending                 </div>             </div>         </div>`)[0];
+                popup_5b4bfaf16944634e933a48e0273e246a.setContent(html_b3c1732f6b63525235d6187b3bbe5fd0);
+            
+        
+
+        circle_marker_de6301c94896a28f83e016f28bc691d6.bindPopup(popup_5b4bfaf16944634e933a48e0273e246a)
+        ;
+
+        
+    
+    
+            circle_marker_de6301c94896a28f83e016f28bc691d6.bindTooltip(
+                `<div>
+                     San Diego (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c9cead741c37e092bc6b1300b21b0bf5 = L.circleMarker(
+                [36.1626638, -86.7816016],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_d52a9215a09db427d643a741270fe837 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_d5914e3b2e5d74f650fcb5d44a7ae420 = $(`<div id="html_d5914e3b2e5d74f650fcb5d44a7ae420" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Nashville                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                                      </div>             </div>         </div>`)[0];
+                popup_d52a9215a09db427d643a741270fe837.setContent(html_d5914e3b2e5d74f650fcb5d44a7ae420);
+            
+        
+
+        circle_marker_c9cead741c37e092bc6b1300b21b0bf5.bindPopup(popup_d52a9215a09db427d643a741270fe837)
+        ;
+
+        
+    
+    
+            circle_marker_c9cead741c37e092bc6b1300b21b0bf5.bindTooltip(
+                `<div>
+                     Nashville (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3e118bf9916ab65a686ab97b09a21921 = L.circleMarker(
+                [39.7392358, -104.990251],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_e788ebda699ab91eb40f4e491fb0e5c7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7c88b016170875cc1c598c2e2249af5e = $(`<div id="html_7c88b016170875cc1c598c2e2249af5e" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Denver                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                                      </div>             </div>         </div>`)[0];
+                popup_e788ebda699ab91eb40f4e491fb0e5c7.setContent(html_7c88b016170875cc1c598c2e2249af5e);
+            
+        
+
+        circle_marker_3e118bf9916ab65a686ab97b09a21921.bindPopup(popup_e788ebda699ab91eb40f4e491fb0e5c7)
+        ;
+
+        
+    
+    
+            circle_marker_3e118bf9916ab65a686ab97b09a21921.bindTooltip(
+                `<div>
+                     Denver (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2615b44eb304764595d71ca049aa9d31 = L.circleMarker(
+                [47.6061389, -122.3328481],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_6e24f4108898025006bf502a2cc30746 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1faff7870913597d9dcbea04c603b324 = $(`<div id="html_1faff7870913597d9dcbea04c603b324" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     Seattle                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                                      </div>             </div>         </div>`)[0];
+                popup_6e24f4108898025006bf502a2cc30746.setContent(html_1faff7870913597d9dcbea04c603b324);
+            
+        
+
+        circle_marker_2615b44eb304764595d71ca049aa9d31.bindPopup(popup_6e24f4108898025006bf502a2cc30746)
+        ;
+
+        
+    
+    
+            circle_marker_2615b44eb304764595d71ca049aa9d31.bindTooltip(
+                `<div>
+                     Seattle (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_68830eaec8401ce8d9dbc5c3cdff9ed1 = L.circleMarker(
+                [51.5072178, -0.1275862],
+                {"bubblingMouseEvents": true, "color": "#ff9100", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff9100", "fillOpacity": 0.8, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 2}
+            ).addTo(feature_group_0cab5303d1f153a58c3ff547f85e9731);
+        
+    
+        var popup_d613716315d864c54317e87c07c7118d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_290344563276222f3666dbca6158359d = $(`<div id="html_290344563276222f3666dbca6158359d" style="width: 100.0%; height: 100.0%;">             <div style="font-family: 'Segoe UI', sans-serif; min-width: 220px;">                 <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #fff;">                     London                 </h3>                 <div style="margin-bottom: 10px;">                     <span style="                         color: #ff9100;                          border: 1px solid #ff9100;                         background-color: rgba(255, 145, 0, 0.2);                         padding: 3px 8px;                          border-radius: 12px;                          font-size: 12px;                          font-weight: bold;                          letter-spacing: 0.5px;                         text-transform: uppercase;">                         Planned (2026)                     </span>                 </div>                 <div style="font-size: 13px; color: #ccc; border-top: 1px solid #444; padding-top: 8px;">                     First international robotaxi service                 </div>             </div>         </div>`)[0];
+                popup_d613716315d864c54317e87c07c7118d.setContent(html_290344563276222f3666dbca6158359d);
+            
+        
+
+        circle_marker_68830eaec8401ce8d9dbc5c3cdff9ed1.bindPopup(popup_d613716315d864c54317e87c07c7118d)
+        ;
+
+        
+    
+    
+            circle_marker_68830eaec8401ce8d9dbc5c3cdff9ed1.bindTooltip(
+                `<div>
+                     London (Planned (2026))
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_0cab5303d1f153a58c3ff547f85e9731.addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+        
+    
+            var layer_control_51eff374a293b3d176da04b816968d62_layers = {
+                base_layers : {
+                    "cartodbdarkmatter" : tile_layer_fc5badb7ab5a65bec18243afc5b96be8,
+                },
+                overlays :  {
+                    "\u003cspan style=\"color:#00e676\"\u003eFully Autonomous\u003c/span\u003e" : feature_group_155df69e7b5cd8670ca9198b3c2e4422,
+                    "\u003cspan style=\"color:#2979ff\"\u003eEmployee Testing\u003c/span\u003e" : feature_group_bc51525a2365f6447e9f1e54427a394b,
+                    "\u003cspan style=\"color:#ffea00\"\u003eTesting (Safety Drivers)\u003c/span\u003e" : feature_group_5cc52c4ec40d99d676882269664db6c3,
+                    "\u003cspan style=\"color:#ff9100\"\u003ePlanned (2026)\u003c/span\u003e" : feature_group_0cab5303d1f153a58c3ff547f85e9731,
+                },
+            };
+            let layer_control_51eff374a293b3d176da04b816968d62 = L.control.layers(
+                layer_control_51eff374a293b3d176da04b816968d62_layers.base_layers,
+                layer_control_51eff374a293b3d176da04b816968d62_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_15ebaeb266aaead6f1ff18dbd9cd79b0);
+
+        
+</script>
+</html>
