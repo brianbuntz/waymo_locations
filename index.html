@@ -136,15 +136,15 @@
         }
 
         /* Legend */
-        .legend-box {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            width: 220px;
-            pointer-events: auto;
-        }
-        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; }
+      .legend-box {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 260px;
+    pointer-events: auto;
+}
+.legend-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.06); }
 
         /* Popup Styling */
         .leaflet-popup-content-wrapper {
@@ -210,19 +210,6 @@
         </div>
     </div>
 
-     <div class="glass-panel legend-box">
--        <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">
--            Status Legend
--        </div>
--        <div class="legend-item"><span class="dot" style="background:#00e676; box-shadow: 0 0 5px #00e676;"></span>Live / Public Service</div>
--        <div class="legend-item"><span class="dot" style="background:#ffab00;"></span>Testing / Employee Only</div>
--        <div class="legend-item"><span class="dot" style="background:#2979ff;"></span>Mapping / Data Collection</div>
--        <div class="legend-item"><span class="dot" style="background:#aaa; opacity: 0.5;"></span>Planned (Translucent)</div>
--        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #888;">
--            <em>Dot size = service area coverage</em>
--        </div>
--    </div>
-
     <div class="glass-panel legend-box">
     <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">
         Status Legend
@@ -264,11 +251,6 @@
         <em>Dot size = service area coverage</em>
     </div>
 </div>
-    
-+    <div class="glass-panel legend-box">
-+        <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">
-+            Status Legend
-+        </div>
 +
 +        <!-- Live / Public -->
 +        <div class="legend-item">
