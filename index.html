@@ -213,9 +213,12 @@
     </div>
 
     <div class="glass-panel legend-box">
-    <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">
-        Status Legend
-    </div>
+   <div class="legend-toggle" id="legendToggle">
+    <span>Status Legend</span>
+    <span class="legend-arrow" id="legendArrow">▶</span>
+</div>
+
+<div id="legendContent" class="legend-content">
 
     <!-- Live / Public -->
     <div class="legend-item">
@@ -226,35 +229,36 @@
         </div>
     </div>
 
-    <!-- Testing -->
-    <div class="legend-item">
-        <span class="dot" style="background:#ffab00;"></span>
-        <div>
-            <div style="font-weight:600;">Testing - Employee / Safety / Autonomous</div>
-            <div style="font-size:11px; color:#bbb;">Limited operations (employees, safety drivers, autonomous or weather testing)</div>
+        <!-- Testing -->
+        <div class="legend-item">
+            <span class="dot" style="background:#ffab00;"></span>
+            <div>
+                <div style="font-weight:600;">Testing - Employee / Safety / Autonomous</div>
+                <div style="font-size:11px; color:#bbb;">Limited operations (employees, safety drivers, autonomous or weather testing)</div>
+            </div>
         </div>
-    </div>
-
-    <!-- Mapping -->
-    <div class="legend-item">
-        <span class="dot" style="background:#2979ff;"></span>
-        <div>
-            <div style="font-weight:600;">Testing / Mapping / Data Collection</div>
-            <div style="font-size:11px; color:#bbb;">Mapping, safety-driver tests, data collection</div>
+    
+        <!-- Mapping -->
+        <div class="legend-item">
+            <span class="dot" style="background:#2979ff;"></span>
+            <div>
+                <div style="font-weight:600;">Testing / Mapping / Data Collection</div>
+                <div style="font-size:11px; color:#bbb;">Mapping, safety-driver tests, data collection</div>
+            </div>
         </div>
-    </div>
-
-    <!-- Planned -->
-    <div class="legend-item">
-        <span class="dot" style="background:#aaa; opacity:0.5; border:1px solid rgba(255,255,255,0.08);"></span>
-        <div>
-            <div style="font-weight:600;">Planned / Future</div>
-            <div style="font-size:11px; color:#bbb;">Pre-launch or planned city (translucent)</div>
+    
+        <!-- Planned -->
+        <div class="legend-item">
+            <span class="dot" style="background:#aaa; opacity:0.5; border:1px solid rgba(255,255,255,0.08);"></span>
+            <div>
+                <div style="font-weight:600;">Planned / Future</div>
+                <div style="font-size:11px; color:#bbb;">Pre-launch or planned city (translucent)</div>
+            </div>
         </div>
-    </div>
-
-    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #888;">
-        <em>Dot size = service area coverage</em>
+    
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #888;">
+            <em>Dot size = service area coverage</em>
+        </div>
     </div>
 </div>
 
@@ -696,6 +700,17 @@
 
         // Initial Load
         updateDisplayAndMap(2020);
+
+        // Legend Toggle
+const legendToggle = document.getElementById("legendToggle");
+const legendContent = document.getElementById("legendContent");
+const legendArrow = document.getElementById("legendArrow");
+
+legendToggle.addEventListener("click", () => {
+    legendContent.classList.toggle("collapsed");
+    legendArrow.classList.toggle("collapsed");
+});
+
 
     </script>
 </body>
