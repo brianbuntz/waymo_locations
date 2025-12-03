@@ -655,33 +655,33 @@
         let isPlaying = false;
         let intervalId = null;
 
-        function togglePlay() {
-            isPlaying = !isPlaying;
-            if (isPlaying) {
-                playIcon.style.display = 'none';
-                pauseIcon.style.display = 'block';
-                
-                if (parseInt(slider.value) >= parseInt(slider.max)) {
-                    slider.value = slider.min;
-                    updateDisplayAndMap(slider.min);
+       function togglePlay() {
+        isPlaying = !isPlaying;
+        if (isPlaying) {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+    
+            // Always reset playback to 2020
+            slider.value = slider.min;
+            updateDisplayAndMap(slider.min);
+    
+            intervalId = setInterval(() => {
+                let currentVal = parseInt(slider.value);
+                if (currentVal < parseInt(slider.max)) {
+                    currentVal++;
+                    slider.value = currentVal;
+                    updateDisplayAndMap(currentVal);
+                } else {
+                    togglePlay();
                 }
-                
-                intervalId = setInterval(() => {
-                    let currentVal = parseInt(slider.value);
-                    if (currentVal < parseInt(slider.max)) {
-                        currentVal++;
-                        slider.value = currentVal;
-                        updateDisplayAndMap(currentVal);
-                    } else {
-                        togglePlay();
-                    }
-                }, 1000);
-            } else {
-                playIcon.style.display = 'block';
-                pauseIcon.style.display = 'none';
-                clearInterval(intervalId);
-            }
+            }, 1000);
+        } else {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            clearInterval(intervalId);
         }
+    }
+
 
         function updateDisplayAndMap(val) {
             display.innerText = val;
@@ -695,7 +695,7 @@
         playBtn.addEventListener('click', togglePlay);
 
         // Initial Load
-        updateDisplayAndMap(2025);
+        updateDisplayAndMap(2020);
 
     </script>
 </body>
