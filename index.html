@@ -255,7 +255,10 @@
                 status: "Live - Fully Autonomous", 
                 operationsStarted: 2019, publicYear: 2024, 
                 lat: 34.0549076, lng: -118.242643, 
-                baseNotes: "Approved for freeways.",
+                baseNotes: "Serving the greater LA area.",
+                notesByYear: {
+                    2025: "Approved for freeways."
+                },
                 serviceAreaByYear: {
                     2023: "63 sq mi",
                     2024: "75 sq mi",
@@ -528,6 +531,9 @@
                     }
                 }
 
+                // Get service area for this year
+                const serviceArea = getServiceAreaForYear(loc, year);
+
                 // Calculate radius based on service area (if available and public)
                 let radius = 6; // Default for testing/mapping locations
                 if (serviceArea && loc.publicYear <= year) {
@@ -547,9 +553,25 @@
                     fillOpacity: isFuture ? 0.35 : 0.85
                 });
 
-                // Build notes with year-appropriate service area
-                const serviceArea = getServiceAreaForYear(loc, year);
-                let notesHtml = `<div style="font-size:13px; line-height: 1.4;">${loc.baseNotes}</div>`;
+                // Build notes with year-appropriate service area and dynamic notes
+                
+                // Get year-specific notes if available
+                let displayNotes = loc.baseNotes;
+                if (loc.notesByYear) {
+                    // Find the most recent note at or before this year
+                    let relevantNoteYear = null;
+                    for (let y = year; y >= 2020; y--) {
+                        if (loc.notesByYear[y]) {
+                            relevantNoteYear = y;
+                            break;
+                        }
+                    }
+                    if (relevantNoteYear) {
+                        displayNotes += " " + loc.notesByYear[relevantNoteYear];
+                    }
+                }
+                
+                let notesHtml = `<div style="font-size:13px; line-height: 1.4;">${displayNotes}</div>`;
                 
                 if (serviceArea && loc.publicYear <= year) {
                     notesHtml += `<div class="popup-service-area"><strong>Service Area:</strong> ${serviceArea}</div>`;
