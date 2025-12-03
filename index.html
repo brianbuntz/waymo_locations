@@ -25,7 +25,7 @@
         .overlay-container {
             position: absolute;
             z-index: 1000;
-            pointer-events: none; /* Let clicks pass through to map where not on controls */
+            pointer-events: none;
             top: 0; left: 0; right: 0; bottom: 0;
             display: flex;
             flex-direction: column;
@@ -40,6 +40,14 @@
         }
         .title-text { font-size: 24px; font-weight: 700; margin: 0 0 5px 0; letter-spacing: -0.5px; }
         .subtitle-text { font-size: 14px; color: #aaa; margin: 0; }
+
+        /* Stats Box */
+        .stats-box {
+            max-width: 200px;
+            text-align: right;
+        }
+        .stat-number { font-size: 32px; font-weight: 700; color: #00e676; margin: 0; }
+        .stat-label { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
 
         /* Timeline Control */
         .timeline-container {
@@ -142,6 +150,15 @@
             display: inline-block; padding: 2px 6px; border-radius: 4px; 
             font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 5px;
         }
+        .popup-service-area {
+            background: rgba(0, 230, 118, 0.15);
+            border: 1px solid rgba(0, 230, 118, 0.3);
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+        .popup-service-area strong { color: #00e676; }
 
     </style>
 </head>
@@ -154,6 +171,10 @@
             <div class="glass-panel title-box">
                 <h1 class="title-text">Waymo Deployment</h1>
                 <p class="subtitle-text">Interactive Timeline of Operations</p>
+            </div>
+            <div class="glass-panel stats-box">
+                <p class="stat-number" id="cityCount">5</p>
+                <p class="stat-label">Cities with Public Service</p>
             </div>
         </div>
 
@@ -183,44 +204,256 @@
         <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 5px;">
             Status Legend
         </div>
-        <div class="legend-item"><span class="dot" style="background:#00e676; box-shadow: 0 0 5px #00e676;"></span>Live / Public</div>
-        <div class="legend-item"><span class="dot" style="background:#2979ff;"></span>Testing / Operations</div>
-        <div class="legend-item"><span class="dot" style="background:#aaa; opacity: 0.4;"></span>Future (Translucent)</div>
+        <div class="legend-item"><span class="dot" style="background:#00e676; box-shadow: 0 0 5px #00e676;"></span>Live / Public Service</div>
+        <div class="legend-item"><span class="dot" style="background:#ffab00;"></span>Testing / Employee Only</div>
+        <div class="legend-item"><span class="dot" style="background:#2979ff;"></span>Mapping / Data Collection</div>
+        <div class="legend-item"><span class="dot" style="background:#aaa; opacity: 0.5;"></span>Planned (Translucent)</div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
-        // Data parsed from CSV - using PUBLIC SERVICE ACCESS dates for chronological commercial deployment
+        // Data with year-by-year service area information
         const waymoData = [
-            { city: "Phoenix", state: "AZ", status: "Live - Fully Autonomous", publicYear: 2020, lat: 33.4482948, lng: -112.0725488, notes: "315 sq mi service area; includes Sky Harbor Airport." },
-            { city: "San Francisco", state: "CA", status: "Live - Fully Autonomous", publicYear: 2023, lat: 37.7749295, lng: -122.4194155, notes: "55+ sq mi service area; includes Daly City/Colma." },
-            { city: "Los Angeles", state: "CA", status: "Live - Fully Autonomous", publicYear: 2024, lat: 34.0549076, lng: -118.242643, notes: "120+ sq mi service area; approved for freeways." },
-            { city: "Austin", state: "TX", status: "Live - Partnership", publicYear: 2025, lat: 30.267153, lng: -97.7430608, notes: "Available publicly via Uber partnership." },
-            { city: "Atlanta", state: "GA", status: "Live - Partnership", publicYear: 2025, lat: 33.7501275, lng: -84.3885209, notes: "Available publicly via Uber partnership." },
-            { city: "Miami", state: "FL", status: "Testing - Fully Autonomous", publicYear: 2026, lat: 25.7616798, lng: -80.1917902, notes: "Driverless testing started Nov 18, 2025. Public launch planned 2026." },
-            { city: "Dallas", state: "TX", status: "Testing - Employee Only", publicYear: 2026, lat: 32.7766642, lng: -96.7969879, notes: "Employee operations starting late 2025. Public launch planned 2026." },
-            { city: "Houston", state: "TX", status: "Testing - Employee Only", publicYear: 2026, lat: 29.7600771, lng: -95.3701108, notes: "Employee operations starting late 2025. Public launch planned 2026." },
-            { city: "San Antonio", state: "TX", status: "Testing - Employee Only", publicYear: 2026, lat: 29.4251905, lng: -98.4945922, notes: "Employee operations starting late 2025. Public launch planned 2026." },
-            { city: "Orlando", state: "FL", status: "Testing - Employee Only", publicYear: 2026, lat: 28.5383832, lng: -81.3789269, notes: "Employee operations starting late 2025. Public launch planned 2026." },
-            { city: "Las Vegas", state: "NV", status: "Planned Expansion", publicYear: 2026, lat: 36.171563, lng: -115.1391009, notes: "Targeting Summer 2026 launch." },
-            { city: "San Diego", state: "CA", status: "Planned Expansion", publicYear: 2026, lat: 32.715738, lng: -117.1610838, notes: "Permits pending; announced late 2025." },
-            { city: "London", state: "UK", status: "Planned International", publicYear: 2026, lat: 51.5072178, lng: -0.1275862, notes: "First international commercial launch target." },
-            { city: "Detroit", state: "MI", status: "Testing - Winter/Snow", publicYear: 2027, lat: 42.3297182, lng: -83.0424533, notes: "Winter testing hub; public service timeline unclear." },
-            { city: "Washington", state: "DC", status: "Testing - Delayed", publicYear: 2027, lat: 38.9071923, lng: -77.0368707, notes: "Launch delayed due to regulatory funding cuts." },
-            { city: "Nashville", state: "TN", status: "Planned Expansion", publicYear: 2027, lat: 36.1626638, lng: -86.7816016, notes: "Included in future roadmap announcements." },
-            { city: "Denver", state: "CO", status: "Planned Expansion", publicYear: 2027, lat: 39.7392358, lng: -104.990251, notes: "Included in future roadmap announcements." },
-            { city: "Seattle", state: "WA", status: "Testing - Mapping", publicYear: 2027, lat: 47.6061389, lng: -122.3328481, notes: "Rain/Mapping data collection. Public service TBD." },
-            { city: "New York City", state: "NY", status: "Testing - Safety Driver", publicYear: 2027, lat: 40.7127753, lng: -74.0059728, notes: "Manhattan/Brooklyn pilot with safety drivers. Public service TBD." },
-            { city: "Buffalo", state: "NY", status: "Testing - Winter/Snow", publicYear: 2028, lat: 42.8864468, lng: -78.8783689, notes: "Winter weather capability testing only." },
-            { city: "Boston", state: "MA", status: "Testing - Mapping", publicYear: 2028, lat: 42.3601, lng: -71.0589, notes: "Mapping and data collection operations." },
-            { city: "New Orleans", state: "LA", status: "Testing - Mapping", publicYear: 2028, lat: 29.9511, lng: -90.0715, notes: "Mapping and data collection operations." },
-            { city: "Philadelphia", state: "PA", status: "Testing - Mapping", publicYear: 2028, lat: 39.9526, lng: -75.1652, notes: "Mapping and data collection operations." },
-            { city: "Tokyo", state: "Japan", status: "Testing - Mapping", publicYear: 2028, lat: 35.6764225, lng: 139.650027, notes: "Mapping/Testing in multiple wards (Minato, Shibuya)." }
+            // === LIVE PUBLIC SERVICE ===
+            { 
+                city: "Phoenix", state: "AZ", country: "USA",
+                status: "Live - Fully Autonomous", 
+                operationsStarted: 2016, publicYear: 2020, 
+                lat: 33.4482948, lng: -112.0725488, 
+                baseNotes: "Includes Sky Harbor Airport.",
+                serviceAreaByYear: {
+                    2020: "100 sq mi",
+                    2021: "100 sq mi",
+                    2022: "100 sq mi",
+                    2023: "225 sq mi",
+                    2024: "315 sq mi",
+                    2025: "315 sq mi"
+                }
+            },
+            { 
+                city: "San Francisco Bay Area", state: "CA", country: "USA",
+                status: "Live - Fully Autonomous", 
+                operationsStarted: 2009, publicYear: 2022, 
+                lat: 37.7749295, lng: -122.4194155, 
+                baseNotes: "Includes Daly City/Colma.",
+                serviceAreaByYear: {
+                    2022: "~50 sq mi",
+                    2023: "~50 sq mi",
+                    2024: "55 sq mi",
+                    2025: "260 sq mi"
+                }
+            },
+            { 
+                city: "Los Angeles", state: "CA", country: "USA",
+                status: "Live - Fully Autonomous", 
+                operationsStarted: 2019, publicYear: 2024, 
+                lat: 34.0549076, lng: -118.242643, 
+                baseNotes: "Approved for freeways.",
+                serviceAreaByYear: {
+                    2023: "63 sq mi",
+                    2024: "75 sq mi",
+                    2025: "120 sq mi"
+                }
+            },
+            { 
+                city: "Austin", state: "TX", country: "USA",
+                status: "Live - Partnership", 
+                operationsStarted: 2023, publicYear: 2025, 
+                lat: 30.267153, lng: -97.7430608, 
+                baseNotes: "Available via Uber partnership.",
+                serviceAreaByYear: {
+                    2025: "90 sq mi"
+                }
+            },
+            { 
+                city: "Atlanta", state: "GA", country: "USA",
+                status: "Live - Partnership", 
+                operationsStarted: 2024, publicYear: 2025, 
+                lat: 33.7501275, lng: -84.3885209, 
+                baseNotes: "Available via Uber partnership.",
+                serviceAreaByYear: {
+                    2025: "65 sq mi"
+                }
+            },
+
+            // === TESTING / EMPLOYEE OPERATIONS - 2026 PLANNED ===
+            { 
+                city: "Miami", state: "FL", country: "USA",
+                status: "Testing - Fully Autonomous", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 25.7616798, lng: -80.1917902, 
+                baseNotes: "Driverless testing started Nov 2025."
+            },
+            { 
+                city: "Dallas", state: "TX", country: "USA",
+                status: "Testing - Employee Only", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 32.7766642, lng: -96.7969879, 
+                baseNotes: "Employee operations starting late 2025."
+            },
+            { 
+                city: "Houston", state: "TX", country: "USA",
+                status: "Testing - Employee Only", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 29.7600771, lng: -95.3701108, 
+                baseNotes: "Employee operations starting late 2025."
+            },
+            { 
+                city: "San Antonio", state: "TX", country: "USA",
+                status: "Testing - Employee Only", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 29.4251905, lng: -98.4945922, 
+                baseNotes: "Employee operations starting late 2025."
+            },
+            { 
+                city: "Orlando", state: "FL", country: "USA",
+                status: "Testing - Employee Only", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 28.5383832, lng: -81.3789269, 
+                baseNotes: "Employee operations starting late 2025."
+            },
+            { 
+                city: "Las Vegas", state: "NV", country: "USA",
+                status: "Planned Expansion", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 36.171563, lng: -115.1391009, 
+                baseNotes: "Targeting Summer 2026 launch."
+            },
+            { 
+                city: "San Diego", state: "CA", country: "USA",
+                status: "Planned Expansion", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 32.715738, lng: -117.1610838, 
+                baseNotes: "Permits pending; announced late 2025."
+            },
+            { 
+                city: "Nashville", state: "TN", country: "USA",
+                status: "Planned Expansion", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 36.1626638, lng: -86.7816016, 
+                baseNotes: "Included in future roadmap."
+            },
+            { 
+                city: "Detroit", state: "MI", country: "USA",
+                status: "Testing - Winter/Snow", 
+                operationsStarted: 2016, publicYear: 2026, 
+                lat: 42.3297182, lng: -83.0424533, 
+                baseNotes: "Winter testing hub; driverless testing started 2025."
+            },
+            { 
+                city: "Washington", state: "DC", country: "USA",
+                status: "Testing - Delayed", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 38.9071923, lng: -77.0368707, 
+                baseNotes: "Launch delayed due to regulatory issues."
+            },
+            { 
+                city: "London", state: "", country: "UK",
+                status: "Planned International", 
+                operationsStarted: 2025, publicYear: 2026, 
+                lat: 51.5072178, lng: -0.1275862, 
+                baseNotes: "First international commercial launch target."
+            },
+
+            // === TESTING / MAPPING - TBD ===
+            { 
+                city: "Denver", state: "CO", country: "USA",
+                status: "Testing - Safety Driver", 
+                operationsStarted: 2025, publicYear: 2027, 
+                lat: 39.7392358, lng: -104.990251, 
+                baseNotes: "Testing with safety drivers started 2025."
+            },
+            { 
+                city: "Seattle", state: "WA", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2027, 
+                lat: 47.6061389, lng: -122.3328481, 
+                baseNotes: "Rain/Mapping data collection."
+            },
+            { 
+                city: "New York City", state: "NY", country: "USA",
+                status: "Testing - Safety Driver", 
+                operationsStarted: 2023, publicYear: 2027, 
+                lat: 40.7127753, lng: -74.0059728, 
+                baseNotes: "Manhattan/Brooklyn pilot with safety drivers."
+            },
+            { 
+                city: "Baltimore", state: "MD", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2027, 
+                lat: 39.2904, lng: -76.6122, 
+                baseNotes: "Manual test fleet; phased rollout planned."
+            },
+            { 
+                city: "Pittsburgh", state: "PA", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2027, 
+                lat: 40.4406, lng: -79.9959, 
+                baseNotes: "Mapping and manually driven test vehicles."
+            },
+            { 
+                city: "St. Louis", state: "MO", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2027, 
+                lat: 38.627, lng: -90.1994, 
+                baseNotes: "Data collection with human drivers."
+            },
+
+            // === TESTING ONLY - FAR FUTURE ===
+            { 
+                city: "Buffalo", state: "NY", country: "USA",
+                status: "Testing - Winter/Snow", 
+                operationsStarted: 2024, publicYear: 2028, 
+                lat: 42.8864468, lng: -78.8783689, 
+                baseNotes: "Winter weather capability testing."
+            },
+            { 
+                city: "Boston", state: "MA", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2028, 
+                lat: 42.3601, lng: -71.0589, 
+                baseNotes: "Mapping and data collection."
+            },
+            { 
+                city: "New Orleans", state: "LA", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2028, 
+                lat: 29.9511, lng: -90.0715, 
+                baseNotes: "Mapping and data collection."
+            },
+            { 
+                city: "Philadelphia", state: "PA", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2028, 
+                lat: 39.9526, lng: -75.1652, 
+                baseNotes: "Testing with safety drivers started 2025."
+            },
+            { 
+                city: "Minneapolis", state: "MN", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2028, 
+                lat: 44.9778, lng: -93.265, 
+                baseNotes: "Cold-weather testing focus."
+            },
+            { 
+                city: "Tampa", state: "FL", country: "USA",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2028, 
+                lat: 27.9506, lng: -82.4572, 
+                baseNotes: "Manual-driving test fleet."
+            },
+            { 
+                city: "Tokyo", state: "", country: "Japan",
+                status: "Testing - Mapping", 
+                operationsStarted: 2025, publicYear: 2028, 
+                lat: 35.6764225, lng: 139.650027, 
+                baseNotes: "Testing in Minato and Shibuya wards."
+            }
         ];
 
         // Map Initialization
         const map = L.map('map', {
-            zoomControl: false, // We'll position it manually if needed or leave it off for clean UI
+            zoomControl: false,
             attributionControl: false
         }).setView([36.0, -96], 4);
 
@@ -232,59 +465,100 @@
         
         L.control.attribution({position: 'bottomleft'}).addTo(map);
 
-        // State for markers
         let markersLayer = L.layerGroup().addTo(map);
 
         // Helper: Get Color based on Status
         function getColor(status) {
-            // Live / Fully Autonomous = Green
-            if (status.includes('Live') || status.includes('Fully Autonomous')) return '#00e676';
-            // Everything else (Testing, Mapping, Planned) = Blue
-            return '#2979ff';
+            if (status.includes('Live')) return '#00e676';
+            if (status.includes('Testing') && (status.includes('Employee') || status.includes('Autonomous') || status.includes('Safety Driver') || status.includes('Winter'))) return '#ffab00';
+            if (status.includes('Testing') || status.includes('Mapping')) return '#2979ff';
+            return '#2979ff'; // Planned
+        }
+
+        // Helper: Get service area for a specific year
+        function getServiceAreaForYear(loc, year) {
+            if (!loc.serviceAreaByYear) return null;
+            
+            // Find the most recent service area data at or before this year
+            let relevantYear = null;
+            for (let y = year; y >= 2020; y--) {
+                if (loc.serviceAreaByYear[y]) {
+                    relevantYear = y;
+                    break;
+                }
+            }
+            
+            return relevantYear ? loc.serviceAreaByYear[relevantYear] : null;
         }
 
         // Update Map function
         function updateMap(year) {
             markersLayer.clearLayers();
+            let publicCityCount = 0;
 
             waymoData.forEach(loc => {
-                // Only show if public service year <= current timeline year
-                if (loc.publicYear <= year) {
-                    const color = getColor(loc.status);
-                    // Sites launching in 2026+ are future/planned
-                    const isFuture = loc.publicYear >= 2026;
+                // Determine visibility: show if operations have started or public service year reached
+                const showOnMap = (loc.operationsStarted <= year) || (loc.publicYear <= year);
+                
+                if (!showOnMap) return;
 
-                    // Pulse Effect for New Additions - only for current year launches
-                    const isNew = (loc.publicYear === year) && !isFuture;
+                const isPublic = loc.publicYear <= year && loc.status.includes('Live');
+                const isFuture = loc.publicYear > year;
+                const isNew = loc.publicYear === year && !isFuture;
+                
+                if (isPublic) publicCityCount++;
 
-                    const marker = L.circleMarker([loc.lat, loc.lng], {
-                        radius: isNew ? 12 : 8,
-                        fillColor: color,
-                        color: "#fff",
-                        // Future/Planned Sites are translucent
-                        weight: isFuture ? 0 : 1,
-                        opacity: isFuture ? 0 : 1,
-                        fillOpacity: isFuture ? 0.4 : 0.8
-                    });
-
-                    const popupContent = `
-                        <div class="popup-header">${loc.city}</div>
-                        <div class="popup-tag" style="border: 1px solid ${color}; color: ${color}; background: rgba(255,255,255,0.05)">${loc.status}</div>
-                        <div class="popup-meta">Public Service: ${loc.publicYear}${isFuture ? ' (Planned)' : ''}</div>
-                        <div style="font-size:13px; line-height: 1.4;">${loc.notes}</div>
-                    `;
-
-                    marker.bindPopup(popupContent);
-                    marker.on('mouseover', function (e) {
-                        this.openPopup();
-                    });
-                    marker.on('mouseout', function (e) {
-                        this.closePopup();
-                    });
-
-                    markersLayer.addLayer(marker);
+                const color = getColor(loc.status);
+                
+                // Determine current status based on timeline
+                let displayStatus = loc.status;
+                if (isFuture && loc.status.includes('Live')) {
+                    // Before public launch, show as testing
+                    if (loc.status.includes('Partnership')) {
+                        displayStatus = 'Pre-Launch Testing';
+                    } else {
+                        displayStatus = 'Testing - Pre-Launch';
+                    }
                 }
+
+                const marker = L.circleMarker([loc.lat, loc.lng], {
+                    radius: isNew ? 12 : 8,
+                    fillColor: color,
+                    color: "#fff",
+                    weight: isFuture ? 0 : 1,
+                    opacity: isFuture ? 0 : 1,
+                    fillOpacity: isFuture ? 0.35 : 0.85
+                });
+
+                // Build notes with year-appropriate service area
+                const serviceArea = getServiceAreaForYear(loc, year);
+                let notesHtml = `<div style="font-size:13px; line-height: 1.4;">${loc.baseNotes}</div>`;
+                
+                if (serviceArea && loc.publicYear <= year) {
+                    notesHtml += `<div class="popup-service-area"><strong>Service Area:</strong> ${serviceArea}</div>`;
+                }
+
+                const locationLabel = loc.state ? `${loc.city}, ${loc.state}` : `${loc.city}, ${loc.country}`;
+                
+                const popupContent = `
+                    <div class="popup-header">${locationLabel}</div>
+                    <div class="popup-tag" style="border: 1px solid ${color}; color: ${color}; background: rgba(255,255,255,0.05)">${displayStatus}</div>
+                    <div class="popup-meta">
+                        Operations: ${loc.operationsStarted} | 
+                        Public: ${loc.publicYear > 2025 ? loc.publicYear + ' (Planned)' : loc.publicYear}
+                    </div>
+                    ${notesHtml}
+                `;
+
+                marker.bindPopup(popupContent);
+                marker.on('mouseover', function (e) { this.openPopup(); });
+                marker.on('mouseout', function (e) { this.closePopup(); });
+
+                markersLayer.addLayer(marker);
             });
+
+            // Update city count
+            document.getElementById('cityCount').innerText = publicCityCount;
         }
 
         // Slider & Play Logic
@@ -303,7 +577,6 @@
                 playIcon.style.display = 'none';
                 pauseIcon.style.display = 'block';
                 
-                // If we are at the end, restart
                 if (parseInt(slider.value) >= parseInt(slider.max)) {
                     slider.value = slider.min;
                     updateDisplayAndMap(slider.min);
@@ -316,9 +589,9 @@
                         slider.value = currentVal;
                         updateDisplayAndMap(currentVal);
                     } else {
-                        togglePlay(); // Stop at end
+                        togglePlay();
                     }
-                }, 800); // 800ms per year
+                }, 1000);
             } else {
                 playIcon.style.display = 'block';
                 pauseIcon.style.display = 'none';
