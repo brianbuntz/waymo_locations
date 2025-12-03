@@ -208,6 +208,9 @@
         <div class="legend-item"><span class="dot" style="background:#ffab00;"></span>Testing / Employee Only</div>
         <div class="legend-item"><span class="dot" style="background:#2979ff;"></span>Mapping / Data Collection</div>
         <div class="legend-item"><span class="dot" style="background:#aaa; opacity: 0.5;"></span>Planned (Translucent)</div>
+        <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #888;">
+            <em>Dot size = service area coverage</em>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -220,7 +223,11 @@
                 status: "Live - Fully Autonomous", 
                 operationsStarted: 2016, publicYear: 2020, 
                 lat: 33.4482948, lng: -112.0725488, 
-                baseNotes: "Includes Sky Harbor Airport.",
+                baseNotes: "First fully autonomous public ride-hail service.",
+                notesByYear: {
+                    2024: "Includes Sky Harbor Airport.",
+                    2025: "Includes Sky Harbor Airport."
+                },
                 serviceAreaByYear: {
                     2020: "100 sq mi",
                     2021: "100 sq mi",
@@ -521,8 +528,18 @@
                     }
                 }
 
+                // Calculate radius based on service area (if available and public)
+                let radius = 6; // Default for testing/mapping locations
+                if (serviceArea && loc.publicYear <= year) {
+                    // Extract numeric value from service area string (e.g., "315 sq mi" -> 315)
+                    const areaValue = parseInt(serviceArea.replace(/[^0-9]/g, ''));
+                    // Scale: sqrt for area-to-radius, then normalize (min 8, max 28)
+                    radius = Math.max(8, Math.min(28, 4 + Math.sqrt(areaValue) * 1.4));
+                }
+                if (isNew) radius = Math.max(radius, 12); // Ensure new launches are visible
+
                 const marker = L.circleMarker([loc.lat, loc.lng], {
-                    radius: isNew ? 12 : 8,
+                    radius: radius,
                     fillColor: color,
                     color: "#fff",
                     weight: isFuture ? 0 : 1,
